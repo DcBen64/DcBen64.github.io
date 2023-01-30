@@ -19,7 +19,7 @@
         // concatenation - '1' + '2' + '3'
         // interpolation - `${var_1}`
         let firstString = "This is a "
-        let secondString = `${ firstString } main paragraph that we added through javascript`
+        let secondString = `${ firstString } The coolest website in the universe.`
         mainParagraph.textContent = secondString
 
         /**
