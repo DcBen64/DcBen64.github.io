@@ -9,25 +9,21 @@
         let mainContent = document.getElementsByTagName("main")[0]
         mainContent.setAttribute("class", "container")
         
-        // another way to access body
+        
         documentBody = document.body
 
         let mainParagraph = document.createElement("p")
         mainParagraph.setAttribute("id", "MainParagraph")
         mainParagraph.setAttribute("class", "mt-3 container")
 
-        // concatenation - '1' + '2' + '3'
-        // interpolation - `${var_1}`
-        let firstString = "This is a "
-        let secondString = `${ firstString } The coolest website in the universe...`
+        
+        let firstString = "This is the "
+        let secondString = `${ firstString } coolest website in the universe made using javascript and this is also on GitHub Pages!`
         mainParagraph.textContent = secondString
 
-        /**
-         * textContent - changes text node
-         * innerHTML - overwrites anything in the innerHTML of that element
-         */
+       
 
-        // add after(append)
+        
         mainContent.appendChild(mainParagraph) 
         
         // add before (before)
@@ -45,13 +41,10 @@
     }
     
     function Start() {
-        console.log("App Started!")
+        console.log("App Started Successfully!")
 
         switch (document.title) {
             case "Home - WEBD6201 Demo":
-                DisplayButton()
-                break
-            case "Projects - WEBD6201 Demo":
                 DisplayButton()
                 break
         }
