@@ -1,34 +1,16 @@
 (function () {
 
     function DisplayHome() {
-        let randomButton = document.getElementById("RandomButton")
-        randomButton.addEventListener("click", function() {
-            location.href = 'projects.html'
+        $("#RandomButton").on("click", function() {
+            location.href = 'contact.html'
         })
-
-        let mainContent = document.getElementsByTagName("main")[0]
-        mainContent.setAttribute("class", "container")
-        
-        // another way to access body
-        documentBody = document.body
-
-        let mainParagraph = document.createElement("p")
-        mainParagraph.setAttribute("id", "MainParagraph")
-        mainParagraph.setAttribute("class", "mt-3 container")
 
         // concatenation - '1' + '2' + '3'
         // interpolation - `${var_1}`
         let firstString = "This is a "
         let secondString = `${ firstString } main paragraph that we added through javascript and this is also on GitHub Pages`
-        mainParagraph.textContent = secondString
 
-        /**
-         * textContent - changes text node
-         * innerHTML - overwrites anything in the innerHTML of that element
-         */
-
-        // add after(append)
-        mainContent.appendChild(mainParagraph) 
+        $("main").addClass("container").append(`<p id="MainParagraph" class="mt-3 container">${ secondString }</p>`)
     }
 
     function DisplayProjects() {
@@ -81,18 +63,24 @@
                     <td class="text-center">${ contact.Name }</td>
                     <td class="text-center">${ contact.ContactNumber }</td>
                     <td class="text-center">${ contact.EmailAddress }</td>
-                    <td class="text-center"></td>
-                    <td class="text-center"></td>
+                    <td class="text-center"><button value="" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i>&nbsp; Edit</button></td>
+                    <td class="text-center"><button value="" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i>&nbsp; Delete</button></td>
                 </tr>
                 `
-
+                
                 index++
             }
 
             contactList.innerHTML = data
         }
     }
-
+    $(document).on("click", ".delete", function() {
+        let row = $(this).closest("tr"); // get the row element that was clicked
+        let index = row[0].rowIndex - 1; // subtract 1 from the row index to get the correct index for the local storage key
+        let key = localStorage.key(index); // get the key from local storage using the index
+        localStorage.removeItem(key); // remove the item from local storage
+        row.remove(); // remove the row from the table
+      });
     function DisplayReferences() {
         console.log("References Page")
     }
