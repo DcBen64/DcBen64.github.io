@@ -17,6 +17,14 @@
         console.log("Projects Page")
     }
 
+    function AddContact(fullName, contactNumber, emailAddress) {
+        let contact = new core.Contact(fullName, contactNumber, emailAddress)
+        if (contact.serialize()) {
+            let key = contact.Name.substring(0, 1) + Date.now()
+            localStorage.setItem(key, contact.serialize())
+        }
+    }
+
     function DisplayContacts() {
         console.log("Contact Us Page")
 
@@ -29,14 +37,9 @@
         // localStorage.removeItem("Random Variable")
 
         submitButton.addEventListener("click", function() {
-            // event.preventDefault()
             if (subscribeCheckbox.checked) {
                 // If user subscribes, store the contact in localStorage
-                let contact = new Contact(fullName.value, contactNumber.value, emailAddress.value)
-                if (contact.serialize()) {
-                    let key = contact.Name.substring(0, 1) + Date.now()
-                    localStorage.setItem(key, contact.serialize())
-                }
+                AddContact(fullName.value, contactNumber.value, emailAddress.value)
             }
         })
     }
@@ -53,7 +56,7 @@
             // for every key in the keys collection
             for (const key of keys) {
                 let contactData = localStorage.getItem(key) // Get localStorage data value related to the key
-                let contact = new Contact()
+                let contact = new core.Contact()
                 
                 contact.deserialize(contactData)
 
@@ -63,8 +66,8 @@
                     <td class="text-center">${ contact.Name }</td>
                     <td class="text-center">${ contact.ContactNumber }</td>
                     <td class="text-center">${ contact.EmailAddress }</td>
-                    <td class="text-center"><button value="" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i>&nbsp; Edit</button></td>
-                    <td class="text-center"><button value="" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i>&nbsp; Delete</button></td>
+                    <td class="text-center"><button value="${ key }" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i>&nbsp; Edit</button></td>
+                    <td class="text-center"><button value="${ key }" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i>&nbsp; Delete</button></td>
                 </tr>
                 `
                 
@@ -72,15 +75,76 @@
             }
 
             contactList.innerHTML = data
+
+            $("button.delete").on("click", function() {
+                if (confirm("Are you sure you want to delete this?"))
+                    localStorage.removeItem($(this).val())
+
+                location.href = 'contact-list.html'
+            })
+
+            $("button.edit").on("click", function() {
+                location.href = 'edit.html#' + $(this).val()
+            })
+        }
+
+        $("#addButton").on("click", () => {
+            location.href = 'edit.html#Add'
+        })
+    }
+
+    function DisplayEditPage() {
+        let page = location.hash.substring(1)
+
+        switch(page) {
+            case "Add":
+                {
+                    $("#welcome").text("WEBD6201 Demo Add Contact")
+
+                    $("#editButton").html(`<i class="fas fa-plus-circle fa-lg"></i> Add`)
+
+                    $("#editButton").on("click", (event) => {
+                        event.preventDefault()
+
+                        // get form information (name, contact number, email address)
+                        AddContact(fullName.value, contactNumber.value, emailAddress.value)
+
+                        // redirect to contact-list
+                        location.href = 'contact-list.html'
+                    })
+                }
+                break
+            default:
+                {
+                    // get contact info from localStorage
+                    let contact = new core.Contact()
+                    contact.deserialize(localStorage.getItem(page))
+
+                    // display contact info in edit form
+                    $("#fullName").val(contact.Name)
+                    $("#contactNumber").val(contact.ContactNumber)
+                    $("#emailAddress").val(contact.EmailAddress)
+
+                    // when edit button is pressed, update the contact
+                    $("#editButton").on("click", (event) => {
+                        event.preventDefault()
+
+                        // get all changes from the form
+                        contact.Name = $("#fullName").val()
+                        contact.ContactNumber = $("#contactNumber").val()
+                        contact.EmailAddress = $("#emailAddress").val()
+
+                        // replace the changes in localStorage
+                        localStorage.setItem(page, contact.serialize())
+
+                        // go back to contact-list.html
+                        location.href = 'contact-list.html'
+                    })
+                }
+                break
         }
     }
-    $(document).on("click", ".delete", function() {
-        let row = $(this).closest("tr"); // get the row element that was clicked
-        let index = row[0].rowIndex - 1; // subtract 1 from the row index to get the correct index for the local storage key
-        let key = localStorage.key(index); // get the key from local storage using the index
-        localStorage.removeItem(key); // remove the item from local storage
-        row.remove(); // remove the row from the table
-      });
+
     function DisplayReferences() {
         console.log("References Page")
     }
@@ -104,7 +168,12 @@
             case "References - WEBD6201 Demo":
                 DisplayReferences()
                 break
+            case "Edit - WEBD6201 Demo":
+                DisplayEditPage()
+                break
         }
+        
+
     }
 
     window.addEventListener("load", Start)
