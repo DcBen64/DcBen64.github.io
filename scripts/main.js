@@ -72,7 +72,7 @@
 
         ValidateInput("fullName", fullNamePattern, "Please enter a valid Full name which means a capitalized first name and capitalized last name")
         ValidateInput("emailAddress", emailAddressPattern, "Please enter a valid Email Address")
-        ValidateInput("contactNumber", contactNumberPattern, "Please enter a valid 10-digit phone number without spaces or dashes") // validating contact number
+        ValidateInput("contactNumber", contactNumberPattern, "Please enter a valid 10-digit phone number without spaces or dashes.") // validating contact number
     }
 
     function DisplayContacts() {
