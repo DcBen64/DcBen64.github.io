@@ -25,5 +25,8 @@
     "bootstrap": "^5.2.3",
     "is-odd": "^3.0.1",
     "jquery": "^3.6.3"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.16"
   }
 }
