@@ -1,6 +1,14 @@
 (function () {
 
-    function DisplayNavBar() {
+    /**
+     * This function uses AJAX to open a connection to the server and returns 
+     * a data payload to the callback function
+     *
+     * @param {string} method
+     * @param {string} url
+     * @param {function} callback
+     */
+    function AjaxRequest(method, url, callback) {
         // AJAX
         // instantiate the XHR Object
         let XHR = new XMLHttpRequest()
@@ -8,15 +16,29 @@
         // add event listener for readystatechange
         XHR.addEventListener("readystatechange", () => {
             if (XHR.readyState === 4 && XHR.status === 200) {
-                $('#navigationBar').html(XHR.responseText)
+                if (typeof callback === 'function') {
+                    callback(XHR.responseText)
+                } else {
+                    console.error("ERROR: callback is not a function")
+                }
             }
         })
 
         // connect and get data
-        XHR.open("GET", "./static/header.html")
+        XHR.open(method, url)
 
         // send request to server to await response
         XHR.send()
+    }
+
+    /**
+     * Load the static header 
+     *
+     * @param {HTML} html_data
+     */
+    function LoadHeader(html_data) {
+        $('#navigationBar').html(html_data)
+        $(`li>a:contains(${ document.title })`).addClass('active')
     }
 
     function DisplayHome() {
@@ -63,23 +85,20 @@
             }
         })
     }
-    
+
     function ContactFormValidate() {
         let emailAddressPattern = /^[\w-\.]+@([\w-]+\.)+[\w-][\D]{2,10}$/g
         let fullNamePattern = /^([A-Z][a-z]{1,25})((\s|,|-)([A-Z][a-z]{1,25}))*(\s|-|,)*([A-Z][a-z]{1,25})*$/g
-        let contactNumberPattern = /^\d{10}$/g // added regex pattern for contact number
-
 
         ValidateInput("fullName", fullNamePattern, "Please enter a valid Full name which means a capitalized first name and capitalized last name")
         ValidateInput("emailAddress", emailAddressPattern, "Please enter a valid Email Address")
-        ValidateInput("contactNumber", contactNumberPattern, "Please enter a valid 10-digit phone number without spaces or dashes.") // validating contact number
     }
 
     function DisplayContacts() {
         console.log("Contact Us Page")
 
         ContactFormValidate()
-        ValidateContactNumber("contactNumber", /^\d{10}$/g, "Please enter a valid 10-digit phone number without spaces or dashes") // validate contact number
+
         let submitButton = document.getElementById("submitButton")
         let subscribeCheckbox = document.getElementById("subscribeCheckbox")
 
@@ -95,26 +114,11 @@
             }
         })
     }
-    function ValidateContactNumber(inputFieldID, regularExpression, exception) {
-        let messageArea = $('#messageArea').hide()
-    
-        $('#' + inputFieldID).on("blur", function() {
-            let inputText = $(this).val()
-    
-            if (!regularExpression.test(inputText)) {
-                // failure to match contact number with regex
-    
-                $(this).trigger("focus").trigger("select")
-    
-                messageArea.addClass("alert alert-danger").text(exception).show()
-            } else {
-                // success in matching contact number with regex
-    
-                messageArea.removeAttr("class").hide()
-            }
-        })
-    }
+
     function DisplayContactList() {
+
+        
+
         if (localStorage.length > 0) {
             let contactList = document.getElementById("contactList") // Our contact list in the table of the contact-list page
 
@@ -219,9 +223,69 @@
     function DisplayReferences() {
         console.log("References Page")
     }
+    function checklogin() {
+        if (sessionStorage.getItem("user")) {
+            $('#login').html(`<a id=logout class="nav-link" href="./logout.html">Log Out</a>`)
+        }
 
-    function DispayLoginPage() {
+        $('#logout').on('click', function() {
+            sessionStorage.removeItem("user")
+            location.href = 'login.html'
+        })
+    }
+    function DisplayLoginPage() {
         console.log("Login Page")
+
+        let messageArea = $('#messageArea')
+        messageArea.hide()
+
+        $('#loginButton').on('click', function() {
+            let success = false
+
+            // create an empty user object
+            let newUser = new core.User()
+
+            // use JQuery to load users.json file and read over it
+            $.get('./Data/users.json', function(data) {
+                // iterate over every user in the users.json file... for loop
+                for (const user of data.users) {
+                    // check if the username and password match the user data
+                    // passed in from users.json
+                    if (username.value == user.Username && password.value == user.Password) {
+                        newUser.fromJSON(user)
+                        success = true
+                        break
+                    }
+                }
+            })
+
+            // if username and password matched (success = true) -> perform the login sequence
+            if (success) {
+                // add user to sessionStorage
+                sessionStorage.setItem('user', newUser.serialize())
+
+                // hide any error messages
+                //missing a part of the code below
+
+                messageArea.removeAttr('class').hide()
+                
+
+                // redirect the user to the secure area of our website - contact-list.html
+                location.href = 'contact-list.html'
+            } else {
+                // display the error message
+                $('#username').trigger('focus').trigger('select')
+                messageArea.addClass('alert alert-danger').text('Error: Invalid Login Credentials.. Username/Password Mismatch')
+            }
+        })
+
+        $('#cancelButton').on('click', function() {
+            // clear the form
+            document.form[0].reset()
+
+            // return to home page
+            location.href = 'index.html'
+        })
     }
     
     function DisplayRegisterPage() {
@@ -231,30 +295,31 @@
     function Start() {
         console.log("App Started Successfully!")
 
+        AjaxRequest("GET", "./static/header.html", LoadHeader)
+
         switch (document.title) {
-            case "Home - WEBD6201 Demo":
+            case "Home":
                 DisplayHome()
-                DisplayNavBar()
                 break
-            case "Projects - WEBD6201 Demo":
+            case "Projects":
                 DisplayProjects()
                 break
-            case "Contact Us - WEBD6201 Demo":
+            case "Contact Us":
                 DisplayContacts()
                 break
-            case "Contact List - WEBD6201 Demo":
+            case "Contact List":
                 DisplayContactList()
                 break
-            case "References - WEBD6201 Demo":
+            case "References":
                 DisplayReferences()
                 break
-            case "Edit - WEBD6201 Demo":
+            case "Edit":
                 DisplayEditPage()
                 break
-            case "Login - WEBD6201 Demo":
+            case "Login":
                 DisplayLoginPage()
                 break
-            case "Register - WEBD6201 Demo":
+            case "Register":
                 DisplayRegisterPage()
                 break
         }
