@@ -2,9 +2,6 @@
 var core;
 (function (core) {
     class Router {
-        m_activeLink;
-        m_linkData;
-        m_routingTable;
         get ActiveLink() {
             return this.m_activeLink;
         }
@@ -52,19 +49,11 @@ router.AddTable([
     "/services",
     "/contact",
     "/contact-list",
-    "/projects",
+    "/products",
     "/register",
     "/login",
     "/edit"
-    
 ]);
 let route = location.pathname;
-// Check if the user landed on the 404 page
-if (route === "/404") {
-    // Redirect to the correct content using the location hash
-    const redirectTo = location.hash ? location.hash.slice(1) : "/";
-    history.replaceState(null, "", redirectTo);
-    route = redirectTo;
-  }
 router.ActiveLink = (router.Find(route) > -1) ? (route == "/") ? "home" : route.substring(1) : "404";
 //# sourceMappingURL=router.js.map

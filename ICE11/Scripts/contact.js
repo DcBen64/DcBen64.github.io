@@ -2,9 +2,6 @@
 var core;
 (function (core) {
     class Contact {
-        m_fullName;
-        m_contactNumber;
-        m_emailAddress;
         get FullName() {
             return this.m_fullName;
         }

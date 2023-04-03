@@ -1,40 +1,33 @@
-// IIFE -- Immediately Invoked Function Expression
-// AKA -- Anonymous Self-Executing Function
+"use strict";
 (function () {
     function AuthGuard() {
-        var protected_routes = [
+        let protected_routes = [
             "contact-list",
             "task-list"
         ];
         if (protected_routes.indexOf(router.ActiveLink) > -1) {
-            // check if user is logged in
             if (!sessionStorage.getItem("user")) {
-                // if not...change the active link to the  login page
                 router.ActiveLink = "login";
             }
         }
     }
-    function LoadLink(link, data) {
-        if (data === void 0) { data = ""; }
+    function LoadLink(link, data = "") {
         router.ActiveLink = link;
         AuthGuard();
         router.LinkData = data;
         history.pushState({}, "", router.ActiveLink);
-        // capitalize active link and set document title to it
         document.title = router.ActiveLink.substring(0, 1).toUpperCase() + router.ActiveLink.substring(1);
-        // remove all active Nav Links
         $("ul>li>a").each(function () {
             $(this).removeClass("active");
         });
-        $("li>a:contains(".concat(document.title, ")")).addClass("active"); // updates the Active link on Navigation items
+        $(`li>a:contains(${document.title})`).addClass("active");
         CheckLogin();
         LoadContent();
     }
     function AddNavigationEvents() {
-        var NavLinks = $("ul>li>a"); // find all Navigation Links
+        let NavLinks = $("ul>li>a");
         NavLinks.off("click");
         NavLinks.off("mouseover");
-        // loop through each Navigation link and load appropriate content on click
         NavLinks.on("click", function () {
             LoadLink($(this).attr("data"));
         });
@@ -43,17 +36,14 @@
         });
     }
     function AddLinkEvents(link) {
-        var linkQuery = $("a.link[data=".concat(link, "]"));
-        // remove all link events
+        let linkQuery = $(`a.link[data=${link}]`);
         linkQuery.off("click");
         linkQuery.off("mouseover");
         linkQuery.off("mouseout");
-        // css adjustments for links
         linkQuery.css("text-decoration", "underline");
         linkQuery.css("color", "blue");
-        // add link events
         linkQuery.on("click", function () {
-            LoadLink("".concat(link));
+            LoadLink(`${link}`);
         });
         linkQuery.on("mouseover", function () {
             $(this).css('cursor', 'pointer');
@@ -63,52 +53,38 @@
             $(this).css('font-weight', 'normal');
         });
     }
-    /**
-     * This function loads the header.html content into a page
-     *
-     * @returns {void}
-     */
     function LoadHeader() {
-        // use AJAX to load the header content
         $.get("./Views/components/header.html", function (html_data) {
-            // inject Header content into the page
             $("header").html(html_data);
             AddNavigationEvents();
             CheckLogin();
         });
     }
-    /**
-     *
-     *
-     * @returns {void}
-     */
     function LoadContent() {
-        var page_name = router.ActiveLink; // alias for the Active Link
-        var callback = ActiveLinkCallBack(); // returns a reference to the correct function
-        $.get("./Views/content/".concat(page_name, ".html"), function (html_date) {
+        let page_name = router.ActiveLink;
+        let callback = ActiveLinkCallBack();
+        $.get(`./Views/content/${page_name}.html`, function (html_date) {
             $("main").html(html_date);
-            callback(); // calling the correct function 
+            callback();
         });
     }
-    /**
-     *
-     * @returns {void}
-     */
     function LoadFooter() {
-        $.get("./Views/components/footer.html", function (html_date) {
+        $.get(`./Views/components/footer.html`, function (html_date) {
             $("footer").html(html_date);
         });
     }
     function DisplayHomePage() {
         console.log("Home Page");
-        $("#ContactButton").on("click", function () {
-            LoadLink("contact");
+        $("#AboutUsButton").on("click", () => {
+            LoadLink("about");
         });
-        $("main").append("<p id=\"MainParagraph\" class=\"mt-3\">Repo for following class exercises n stuff</p>");
-        $("main").append("<article>\n        <p id=\"ArticleParagraph\" class =\"mt-3\">Wow check out all of the cool stuff on this page</p>\n        </article>");
+        $("main").append(`<p id="MainParagraph" class="mt-3">This is the Main Paragraph</p>`);
+        $("main").append(`<article>
+        <p id="ArticleParagraph" class ="mt-3">This is the Article Paragraph</p>
+        </article>`);
     }
-    function DisplayProjectsPage() {
-        console.log("Projects Page");
+    function DisplayProductsPage() {
+        console.log("Products Page");
     }
     function DisplayServicesPage() {
         console.log("Services Page");
@@ -116,31 +92,17 @@
     function DisplayAboutPage() {
         console.log("About Page");
     }
-    /**
-     *This function adds a Contact object to localStorage
-     *
-     * @param {string} fullName
-     * @param {string} contactNumber
-     * @param {string} emailAddress
-     */
     function AddContact(fullName, contactNumber, emailAddress) {
-        var contact = new core.Contact(fullName, contactNumber, emailAddress);
+        let contact = new core.Contact(fullName, contactNumber, emailAddress);
         if (contact.serialize()) {
-            var key = contact.FullName.substring(0, 1) + Date.now();
+            let key = contact.FullName.substring(0, 1) + Date.now();
             localStorage.setItem(key, contact.serialize());
         }
     }
-    /**
-     * This method validates a field in the form and displays an error in the message area div element
-     *
-     * @param {string} fieldID
-     * @param {RegExp} regular_expression
-     * @param {string} error_message
-     */
     function ValidateField(fieldID, regular_expression, error_message) {
-        var messageArea = $("#messageArea").hide();
+        let messageArea = $("#messageArea").hide();
         $("#" + fieldID).on("blur", function () {
-            var text_value = $(this).val();
+            let text_value = $(this).val();
             if (!regular_expression.test(text_value)) {
                 $(this).trigger("focus").trigger("select");
                 messageArea.addClass("alert alert-danger").text(error_message).show();
@@ -162,16 +124,16 @@
             LoadLink("contact-list");
         });
         ContactFormValidation();
-        var sendButton = document.getElementById("sendButton");
-        var subscribeCheckbox = document.getElementById("subscribeCheckbox");
+        let sendButton = document.getElementById("sendButton");
+        let subscribeCheckbox = document.getElementById("subscribeCheckbox");
         sendButton.addEventListener("click", function (event) {
             if (subscribeCheckbox.checked) {
-                var fullName = document.forms[0].fullName.value;
-                var contactNumber = document.forms[0].contactNumber.value;
-                var emailAddress = document.forms[0].emailAddress.value;
-                var contact = new core.Contact(fullName, contactNumber, emailAddress);
+                let fullName = document.forms[0].fullName.value;
+                let contactNumber = document.forms[0].contactNumber.value;
+                let emailAddress = document.forms[0].emailAddress.value;
+                let contact = new core.Contact(fullName, contactNumber, emailAddress);
                 if (contact.serialize()) {
-                    var key = contact.FullName.substring(0, 1) + Date.now();
+                    let key = contact.FullName.substring(0, 1) + Date.now();
                     localStorage.setItem(key, contact.serialize());
                 }
             }
@@ -179,17 +141,22 @@
     }
     function DisplayContactListPage() {
         if (localStorage.length > 0) {
-            var contactList = document.getElementById("contactList");
-            var data = "";
-            var keys = Object.keys(localStorage); // returns a list of keys from localStorage
-            var index = 1;
-            // for every key in the keys string array
-            for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
-                var key = keys_1[_i];
-                var contactData = localStorage.getItem(key); // get localStorage data value
-                var contact = new core.Contact(); // create an empty Contact object
+            let contactList = document.getElementById("contactList");
+            let data = "";
+            let keys = Object.keys(localStorage);
+            let index = 1;
+            for (const key of keys) {
+                let contactData = localStorage.getItem(key);
+                let contact = new core.Contact();
                 contact.deserialize(contactData);
-                data += "<tr>\n                <th scope=\"row\" class=\"text-center\">".concat(index, "</th>\n                <td>").concat(contact.FullName, "</td>\n                <td>").concat(contact.ContactNumber, "</td>\n                <td>").concat(contact.EmailAddress, "</td>\n                <td class=\"text-center\"><button value=\"").concat(key, "\" class=\"btn btn-primary btn-sm edit\"><i class=\"fas fa-edit fa-sm\"></i> Edit</button></td>\n                <td class=\"text-center\"><button value=\"").concat(key, "\" class=\"btn btn-danger btn-sm delete\"><i class=\"fas fa-trash-alt fa-sm\"></i> Delete</button></td>\n                </tr>");
+                data += `<tr>
+                <th scope="row" class="text-center">${index}</th>
+                <td>${contact.FullName}</td>
+                <td>${contact.ContactNumber}</td>
+                <td>${contact.EmailAddress}</td>
+                <td class="text-center"><button value="${key}" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i> Edit</button></td>
+                <td class="text-center"><button value="${key}" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i> Delete</button></td>
+                </tr>`;
                 index++;
             }
             contactList.innerHTML = data;
@@ -203,56 +170,48 @@
                 LoadLink("edit", $(this).val());
             });
         }
-        $("#addButton").on("click", function () {
+        $("#addButton").on("click", () => {
             LoadLink("edit", "add");
         });
     }
-    /**
-     * This function allows JavaScript to work on the Edit Page
-     */
     function DisplayEditPage() {
         console.log("Edit Page");
         ContactFormValidation();
-        var page = router.LinkData;
+        let page = router.LinkData;
         switch (page) {
             case "add":
                 {
                     $("main>h1").text("Add Contact");
-                    $("#editButton").html("<i class=\"fas fa-plus-circle fa-lg\"></i> Add");
-                    $("#editButton").on("click", function (event) {
+                    $("#editButton").html(`<i class="fas fa-plus-circle fa-lg"></i> Add`);
+                    $("#editButton").on("click", (event) => {
                         event.preventDefault();
-                        var fullName = document.forms[0].fullName.value;
-                        var contactNumber = document.forms[0].contactNumber.value;
-                        var emailAddress = document.forms[0].emailAddress.value;
+                        let fullName = document.forms[0].fullName.value;
+                        let contactNumber = document.forms[0].contactNumber.value;
+                        let emailAddress = document.forms[0].emailAddress.value;
                         AddContact(fullName, contactNumber, emailAddress);
                         LoadLink("contact-list");
                     });
-                    $("#cancelButton").on("click", function () {
+                    $("#cancelButton").on("click", () => {
                         LoadLink("contact-list");
                     });
                 }
                 break;
             default:
                 {
-                    // get contact info from localStorage
-                    var contact_1 = new core.Contact();
-                    contact_1.deserialize(localStorage.getItem(page));
-                    // display the contact in the edit form
-                    $("#fullName").val(contact_1.FullName);
-                    $("#contactNumber").val(contact_1.ContactNumber);
-                    $("#emailAddress").val(contact_1.EmailAddress);
-                    $("#editButton").on("click", function (event) {
+                    let contact = new core.Contact();
+                    contact.deserialize(localStorage.getItem(page));
+                    $("#fullName").val(contact.FullName);
+                    $("#contactNumber").val(contact.ContactNumber);
+                    $("#emailAddress").val(contact.EmailAddress);
+                    $("#editButton").on("click", (event) => {
                         event.preventDefault();
-                        // get changes from the page
-                        contact_1.FullName = $("#fullName").val();
-                        contact_1.ContactNumber = $("#contactNumber").val();
-                        contact_1.EmailAddress = $("#emailAddress").val();
-                        // replace the item in local storage
-                        localStorage.setItem(page, contact_1.serialize());
-                        // go back to the contact list page (refresh)
+                        contact.FullName = $("#fullName").val();
+                        contact.ContactNumber = $("#contactNumber").val();
+                        contact.EmailAddress = $("#emailAddress").val();
+                        localStorage.setItem(page, contact.serialize());
                         LoadLink("contact-list");
                     });
-                    $("#cancelButton").on("click", function () {
+                    $("#cancelButton").on("click", () => {
                         LoadLink("contact-list");
                     });
                 }
@@ -261,30 +220,27 @@
     }
     function CheckLogin() {
         if (sessionStorage.getItem("user")) {
-            $("#login").html("<a id=\"logout\" class=\"nav-link\" href=\"#\"><i class=\"fas fa-sign-out-alt\"></i> Logout</a>");
+            $("#login").html(`<a id="logout" class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>`);
             $("#logout").on("click", function () {
                 sessionStorage.clear();
-                $("#login").html("<a class=\"nav-link\" data=\"login\"><i class=\"fas fa-sign-in-alt\"></i> Login</a>");
+                $("#login").html(`<a class="nav-link" data="login"><i class="fas fa-sign-in-alt"></i> Login</a>`);
                 AddNavigationEvents();
                 LoadLink("login");
             });
-           
-        
         }
     }
     function DisplayLoginPage() {
         console.log("Login Page");
-        var messageArea = $("#messageArea");
+        let messageArea = $("#messageArea");
         messageArea.hide();
         AddLinkEvents("register");
         $("#loginButton").on("click", function () {
-            var success = false;
-            var newUser = new core.User();
+            let success = false;
+            let newUser = new core.User();
             $.getJSON("./Data/users.json", function (data) {
-                for (var _i = 0, _a = data.users; _i < _a.length; _i++) {
-                    var user = _a[_i];
-                    var username = $("#username").val();
-                    var password = $("#password").val();
+                for (const user of data.users) {
+                    let username = $("#username").val();
+                    let password = $("#password").val();
                     if (username == user.Username && password == user.Password) {
                         newUser.fromJSON(user);
                         success = true;
@@ -292,13 +248,12 @@
                     }
                 }
                 if (success) {
-                    var serializedUser = newUser.serialize();
+                    let serializedUser = newUser.serialize();
                     if (serializedUser) {
                         sessionStorage.setItem("user", serializedUser);
-                    messageArea.removeAttr("class").hide();
-                    LoadLink("contact-list");
-                    
-                }
+                        messageArea.removeAttr("class").hide();
+                        LoadLink("contact-list");
+                    }
                 }
                 else {
                     $("#username").trigger("focus").trigger("select");
@@ -318,13 +273,11 @@
     function Display404Page() {
         console.log("404 Page");
     }
-    
-      
     function ActiveLinkCallBack() {
         switch (router.ActiveLink) {
             case "home": return DisplayHomePage;
             case "about": return DisplayAboutPage;
-            case "projects": return DisplayProjectsPage;
+            case "products": return DisplayProductsPage;
             case "services": return DisplayServicesPage;
             case "contact": return DisplayContactPage;
             case "contact-list": return DisplayContactListPage;
@@ -332,13 +285,14 @@
             case "login": return DisplayLoginPage;
             case "register": return DisplayRegisterPage;
             case "404": return Display404Page;
-            
             default:
                 console.error("ERROR: callback does not exist: " + router.ActiveLink);
                 return new Function();
         }
     }
-   
+    $(document).ready(function () {
+        Start();
+    });
     function Start() {
         console.log("App Started!");
         LoadHeader();
@@ -349,7 +303,6 @@
     $(document).ready(function () {
         Start();
         ActiveLinkCallBack();
-        
     });
 })();
 //# sourceMappingURL=app.js.map

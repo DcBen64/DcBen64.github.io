@@ -2,10 +2,6 @@
 var core;
 (function (core) {
     class User {
-        m_displayName;
-        m_emailAddress;
-        m_username;
-        m_password;
         get DisplayName() {
             return this.m_displayName;
         }
