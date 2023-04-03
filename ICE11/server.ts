@@ -1,33 +1,58 @@
+import app from './app';
+import debug from 'debug';
+debug('temp:server');
 import http from 'http';
-import fs from 'fs';
-import mime from 'mime-types';
 
-const hostname = '0.0.0.0';
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3010;
-let lookup = mime.lookup;
 
-const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-  let path = req.url as string;
+//Normalize a port into a number, string, or false.
+const normalizePort = (val: string) => {
+  const port = parseInt(val, 10);
 
-  if (path == "/" || path == "/home") {
-    path = "/index.html";
+  if (isNaN(port)) {
+    // named pipe
+    return val;
   }
 
-  let mimeType = mime.lookup(path.substring(1)) as string;
+  if (port >= 0) {
+    // port number
+    return port;
+  }
 
-  fs.readFile(__dirname + path, (err, data) => {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/html' });
-      res.write("<h1>Page Not Found</h1>");
-      res.end();
-    } else {
-      res.setHeader("X-Content-Type-Options", "nosniff");
-      res.writeHead(200, { 'Content-Type': mimeType });
-      res.end(data);
-    }
-  });
-});
+  return false;
+};
+const port = normalizePort(process.env.PORT || '3000') as number;
+app.set('port', port);
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+//event listener for HTTP server "error" event.
+const onError = (error: NodeJS.ErrnoException) => {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  //handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+//event listener for HTTP server "listening" event.
+const onListening = () => {
+  const addr = server.address();
+  const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr?.port;
+  debug('Listening on ' + bind);
+}
+//start the server
+const server = http.createServer(app);
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
