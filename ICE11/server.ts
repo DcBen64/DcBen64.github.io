@@ -26,6 +26,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     }
     res.setHeader("X-Content-Type-Options", "nosniff")
     res.writeHead(200, { 'Content-Type': mimeType });
+    res.end(data);
   });
 });
 
