@@ -9,20 +9,17 @@ const debug_1 = __importDefault(require("debug"));
 const http_1 = __importDefault(require("http"));
 const normalizePort = (val) => {
     const port = parseInt(val, 10);
-    if (isNaN(port)) {
+    if (isNaN(port))
         return val;
-    }
-    if (port >= 0) {
+    if (port >= 0)
         return port;
-    }
     return false;
 };
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3011');
 app_1.default.set('port', port);
 const onError = (error) => {
-    if (error.syscall !== 'listen') {
+    if (error.syscall !== 'listen')
         throw error;
-    }
     const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
     switch (error.code) {
         case 'EACCES':
@@ -38,8 +35,8 @@ const onError = (error) => {
     }
 };
 const onListening = () => {
-    const addr = server.address();
-    const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + (addr === null || addr === void 0 ? void 0 : addr.port);
+    let addr = server.address();
+    let bind = 'pipe ' + addr;
     (0, debug_1.default)('Listening on ' + bind);
 };
 const server = http_1.default.createServer(app_1.default);
