@@ -1,486 +1,367 @@
+(function () {
 
-// IIFE -- Immediately Invoked Function Expression
-// AKA -- Anonymous Self-Executing Function
-(function()
-{
-    function AuthGuard(): void
-    {
-        let protected_routes: string[] = [
-            "contact-list",
-            "task-list"
-        ];
+    function AuthGuard(): void {
+        let protectedRoutes: string[] = [
+            '/contact-list',
+            '/edit'
+        ]
     
-    
-        if(protected_routes.indexOf(router.ActiveLink) > -1)
-        {
+        if (protectedRoutes.indexOf(location.pathname) > -1) {
             // check if user is logged in
-            if(!sessionStorage.getItem("user"))
-            {
-                // if not...change the active link to the  login page
-                router.ActiveLink = "login"
+            if (!sessionStorage.getItem("user")) {
+                // redirect the user to login.html
+                location.href = '/login'
             }
         }
     }
-    
-    function LoadLink(link: string, data: string = ""): void
-    {
-        router.ActiveLink = link;
 
-        AuthGuard();
+    function DisplayHome(): Function {
+        $("#RandomButton").on("click", function() {
+            location.href = '/contact'
+        })
 
-        router.LinkData = data;
-        history.pushState({}, "", router.ActiveLink);
-        
-        // capitalize active link and set document title to it
-        document.title = router.ActiveLink.substring(0, 1).toUpperCase() + router.ActiveLink.substring(1);
+        // concatenation - '1' + '2' + '3'
+        // interpolation - `${var_1}`
+        let firstString = "This is a "
+        let secondString = `${ firstString } main paragraph that we added through javascript and this is also on GitHub Pages`
 
-        // remove all active Nav Links
-        $("ul>li>a").each(function()
-        {
-            $(this).removeClass("active");
-        });
+        $("main").addClass("container").append(`<p id="MainParagraph" class="mt-3 container">${ secondString }</p>`)
 
-        $(`li>a:contains(${document.title})`).addClass("active"); // updates the Active link on Navigation items
-
-        CheckLogin();
-
-        LoadContent();
+        return new Function()
     }
 
-    function AddNavigationEvents(): void
-    {
+    function DisplayProjects(): Function {
+        console.log("Projects Page")
 
-        let NavLinks = $("ul>li>a"); // find all Navigation Links
-
-        NavLinks.off("click");
-        NavLinks.off("mouseover");
-
-        // loop through each Navigation link and load appropriate content on click
-        NavLinks.on("click", function()
-        {
-            LoadLink($(this).attr("data") as string);
-        });
-
-        NavLinks.on("mouseover", function()
-        {
-            $(this).css("cursor", "pointer");
-        });
+        return new Function()
     }
 
-    function AddLinkEvents(link: string): void
-    {
-        let linkQuery = $(`a.link[data=${link}]`);
-        // remove all link events
-        linkQuery.off("click");
-        linkQuery.off("mouseover");
-        linkQuery.off("mouseout");
-
-        // css adjustments for links
-        linkQuery.css("text-decoration", "underline");
-        linkQuery.css("color", "blue");
-
-        // add link events
-        linkQuery.on("click", function()
-        {
-            LoadLink(`${link}`);
-        });
-
-        linkQuery.on("mouseover", function()
-        {
-            $(this).css('cursor', 'pointer');
-            $(this).css('font-weight', 'bold');
-        });
-
-        linkQuery.on("mouseout", function()
-        {
-            $(this).css('font-weight', 'normal');
-        });
-    }
-
-    /**
-     * This function loads the header.html content into a page
-     *
-     * @returns {void}
-     */
-    function LoadHeader(): void
-    {
-        // use AJAX to load the header content
-        $.get("./Views/components/header.html", function(html_data)
-        {
-            // inject Header content into the page
-            $("header").html(html_data);
-
-            AddNavigationEvents();
-            
-            CheckLogin();
-        });
-    }
-
-    /**
-     * 
-     * 
-     * @returns {void}
-     */
-    function LoadContent(): void
-    {
-        let page_name = router.ActiveLink; // alias for the Active Link
-        let callback = ActiveLinkCallBack(); // returns a reference to the correct function
-        $.get(`./Views/content/${page_name}.html`, function(html_date)
-        {
-            $("main").html(html_date);
-            callback(); // calling the correct function 
-        });
-    }
-
-    /**
-     *
-     * @returns {void}
-     */
-    function LoadFooter(): void
-    {
-        $.get(`./Views/components/footer.html`, function(html_date)
-        {
-            $("footer").html(html_date);
-        });
-    }
-
-    function DisplayHomePage(): void
-    {
-        console.log("Home Page");
-        $("#AboutUsButton").on("click", () => 
-        {
-            LoadLink("about");
-        });
-    
-        $("main").append(`<p id="MainParagraph" class="mt-3">This is the Main Paragraph</p>`);
-        $("main").append(`<article>
-        <p id="ArticleParagraph" class ="mt-3">This is the Article Paragraph</p>
-        </article>`);
-    }
-
-    function DisplayProductsPage(): void
-    {
-        console.log("Products Page");
-    }
-
-    function DisplayServicesPage(): void
-    {
-        console.log("Services Page");
-    }
-
-    function DisplayAboutPage(): void
-    {
-        console.log("About Page");
-    }
-
-    /**
-     *This function adds a Contact object to localStorage
-     *
-     * @param {string} fullName
-     * @param {string} contactNumber
-     * @param {string} emailAddress
-     */
-    function AddContact(fullName: string, contactNumber: string, emailAddress: string)
-    {
-        let contact = new core.Contact(fullName, contactNumber, emailAddress);
-        if(contact.serialize())
-        {
-            let key = contact.FullName.substring(0, 1) + Date.now();
-
-            localStorage.setItem(key, contact.serialize() as string);
+    function AddContact(fullName: string, contactNumber: string, emailAddress: string) {
+        let contact = new core.Contact(fullName, contactNumber, emailAddress)
+        if (contact.serialize()) {
+            let key = contact.Name.substring(0, 1) + Date.now()
+            localStorage.setItem(key, contact.serialize() as string)
         }
     }
 
-    /**
-     * This method validates a field in the form and displays an error in the message area div element
-     *
-     * @param {string} fieldID
-     * @param {RegExp} regular_expression
-     * @param {string} error_message
-     */
-    function ValidateField(fieldID: string, regular_expression: RegExp, error_message: string)
-    {
-        let messageArea = $("#messageArea").hide();
-    
-        $("#" + fieldID).on("blur", function()
-        {
-            let text_value = $(this).val() as string;
-            if(!regular_expression.test(text_value))
-            {
-                $(this).trigger("focus").trigger("select");
-                messageArea.addClass("alert alert-danger").text(error_message).show();
+    function ValidateInput(inputFieldID: string, regularExpression: RegExp, exception: string) {
+        let messageArea = $('#messageArea').hide()
+
+        $('#' + inputFieldID).on("blur", function() {
+            let inputText = $(this).val() as string
+
+            if (!regularExpression.test(inputText)) {
+                // failure to match full name with regex
+
+                $(this).trigger("focus").trigger("select")
+
+                messageArea.addClass("alert alert-danger").text(exception).show()
+            } else {
+                // success in matching full name with regex
+
+                messageArea.removeAttr("class").hide()
             }
-            else
-            {
-                messageArea.removeAttr("class").hide();
-            }
-        });
+        })
     }
 
-    function ContactFormValidation(): void
-    {
-        ValidateField("fullName", /^([A-Z][a-z]{1,3}.?\s)?([A-Z][a-z]{1,})((\s|,|-)([A-Z][a-z]{1,}))*(\s|,|-)([A-Z][a-z]{1,})$/, "Please enter a valid Full Name. This must include at least a Capitalized First Name and a Capitalized Last Name.");
-        ValidateField("contactNumber", /^(\+\d{1,3}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, "Please enter a valid Contact Number. Example: (416) 555-5555");
-        ValidateField("emailAddress", /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/, "Please enter a valid Email Address.");
+    function ContactFormValidate(): void {
+        let emailAddressPattern = /^[\w-\.]+@([\w-]+\.)+[\w-][\D]{2,10}$/g
+        let fullNamePattern = /^([A-Z][a-z]{1,25})((\s|,|-)([A-Z][a-z]{1,25}))*(\s|-|,)*([A-Z][a-z]{1,25})*$/g
+
+        ValidateInput("fullName", fullNamePattern, "Please enter a valid Full name which means a capitalized first name and capitalized last name")
+        ValidateInput("emailAddress", emailAddressPattern, "Please enter a valid Email Address")
     }
 
-    function DisplayContactPage(): void
-    {
-        console.log("Contact Page");
+    function DisplayContacts(): Function {
+        console.log("Contact Us Page")
 
-        $("a[data='contact-list']").off("click");
-        $("a[data='contact-list']").on("click", function()
-        {
-            LoadLink("contact-list");
-        });
+        $('a[href="/contact-list"]').off('click')
+        $('a[href="/contact-list"]').on('click', function() {
+            location.href='/contact-list'
+        })
 
-        ContactFormValidation();
-       
-        let sendButton = document.getElementById("sendButton") as HTMLElement;
-        let subscribeCheckbox = document.getElementById("subscribeCheckbox") as HTMLInputElement;
+        ContactFormValidate()
 
-        sendButton.addEventListener("click", function(event)
-        {
+        let submitButton = document.getElementById("submitButton") as HTMLElement
+        let subscribeCheckbox = document.getElementById("subscribeCheckbox") as HTMLInputElement
 
-            if(subscribeCheckbox.checked)
-            {
-                let fullName = document.forms[0].fullName.value;
-                let contactNumber = document.forms[0].contactNumber.value;
-                let emailAddress = document.forms[0].emailAddress.value;
+        submitButton.addEventListener("click", function() {
+            if (subscribeCheckbox.checked) {
+                let fullName = document.forms[0].fullName.value
+                let contactNumber = document.forms[0].contactNumber.value
+                let emailAddress = document.forms[0].emailAddress.value
 
-                let contact = new core.Contact(fullName, contactNumber, emailAddress);
-                if(contact.serialize())
-                {
-                    let key = contact.FullName.substring(0, 1) + Date.now();
+                // If user subscribes, store the contact in localStorage
+                let contact = new core.Contact(fullName, contactNumber, emailAddress)
 
-                    localStorage.setItem(key, contact.serialize() as string);
+                if (contact.serialize()) {
+                    let key = contact.Name.substring(0,1) + Date.now()
+                    localStorage.setItem(key, contact.serialize() as string)
                 }
             }
-        });
+        })
+
+        return new Function()
     }
 
-    function DisplayContactListPage(): void
-    {
-        if(localStorage.length > 0)
-        {
-            let contactList = document.getElementById("contactList") as HTMLElement;
+    function DisplayContactList(): Function {
+        if (localStorage.length > 0) {
+            let contactList = document.getElementById("contactList") as HTMLElement // Our contact list in the table of the contact-list page
 
-            let data = "";
+            let data = "" // Add data to this variable. Append deserialized data from localStorage to data
+            let keys = Object.keys(localStorage) // Return a String Array of keys
 
-            let keys = Object.keys(localStorage); // returns a list of keys from localStorage
+            let index = 1 // Count number of keys
 
-            let index = 1;
+            // for every key in the keys collection
+            for (const key of keys) {
+                let contactData = localStorage.getItem(key) as string // Get localStorage data value related to the key
+                let contact = new core.Contact("", "", "")
+                
+                contact.deserialize(contactData)
 
-            // for every key in the keys string array
-            for(const key of keys)
-            {
-                let contactData = localStorage.getItem(key) as string; // get localStorage data value
-
-                let contact = new core.Contact(); // create an empty Contact object
-                contact.deserialize(contactData);
-
+                // Inject repeatable row into the contactList
                 data += `<tr>
-                <th scope="row" class="text-center">${index}</th>
-                <td>${contact.FullName}</td>
-                <td>${contact.ContactNumber}</td>
-                <td>${contact.EmailAddress}</td>
-                <td class="text-center"><button value="${key}" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i> Edit</button></td>
-                <td class="text-center"><button value="${key}" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i> Delete</button></td>
-                </tr>`;
-
-                index++;
+                    <th scope="row" class="text-center">${ index }</th>
+                    <td class="text-center">${ contact.Name }</td>
+                    <td class="text-center">${ contact.ContactNumber }</td>
+                    <td class="text-center">${ contact.EmailAddress }</td>
+                    <td class="text-center"><button value="${ key }" class="btn btn-primary btn-sm edit"><i class="fas fa-edit fa-sm"></i>&nbsp; Edit</button></td>
+                    <td class="text-center"><button value="${ key }" class="btn btn-danger btn-sm delete"><i class="fas fa-trash-alt fa-sm"></i>&nbsp; Delete</button></td>
+                </tr>
+                `
+                
+                index++
             }
 
-            contactList.innerHTML = data;
+            contactList.innerHTML = data
 
-            $("button.delete").on("click", function()
-            {
-                if(confirm("Are you sure?"))
-                {
+            $("button.delete").on("click", function() {
+                if (confirm("Are you sure you want to delete this?"))
                     localStorage.removeItem($(this).val() as string)
-                }
-                LoadLink("contact-list");
-            });
 
-            $("button.edit").on("click", function()
-            {
-                LoadLink("edit", $(this).val() as string);
-            });
+                // location.href = '/contact-list'
+                location.href='/contact-list'
+            })
+
+            $("button.edit").on("click", function() {
+                // location.href = '/edit#' + $(this).val()
+                location.href='/edit#' + $(this).val() as string
+            })
         }
 
-        $("#addButton").on("click", ()=>
-        {
-            LoadLink("edit", "add");
-        });
+        $("#addButton").on("click", () => {
+            // location.href = '/edit#Add'
+            location.href='/edit#Add'
+        })
+
+        return new Function()
     }
 
-    /**
-     * This function allows JavaScript to work on the Edit Page
-     */
-    function DisplayEditPage(): void
-    {
-        console.log("Edit Page");
+    function DisplayEditPage(): Function {
+        ContactFormValidate()
 
-        ContactFormValidation();
+        let page = location.hash.substring(1)
+        console.log(page);
+        
 
-        let page = router.LinkData;
-
-        switch(page)
-        {
-            case "add":
+        switch(page) {
+            case "Add":
                 {
-                    $("main>h1").text("Add Contact");
+                    $("#welcome").text("WEBD6201 Demo Add Contact")
 
                     $("#editButton").html(`<i class="fas fa-plus-circle fa-lg"></i> Add`)
 
-                    $("#editButton").on("click", (event) =>
-                    {
-                        event.preventDefault();
+                    $("#editButton").on("click", (event) => {
+                        event.preventDefault()
 
-                        let fullName = document.forms[0].fullName.value;
-                        let contactNumber = document.forms[0].contactNumber.value;
-                        let emailAddress = document.forms[0].emailAddress.value;
+                        let fullName = document.forms[0].fullName.value
+                        let contactNumber = document.forms[0].contactNumber.value
+                        let emailAddress = document.forms[0].emailAddress.value
 
-                        AddContact(fullName, contactNumber, emailAddress);
-                        LoadLink("contact-list");
-                    });
+                        // Get form information (name, contact number, email address)
+                        AddContact(fullName, contactNumber, emailAddress)
 
-                    $("#cancelButton").on("click", () =>
-                    {
-                        LoadLink("contact-list");
-                    });
+                        // redirect to contact-list
+                        // location.href = '/contact-list'
+                        location.href='/contact-list'
+                    })
                 }
-                break;
+                break
             default:
                 {
                     // get contact info from localStorage
-                    let contact = new core.Contact();
-                    contact.deserialize(localStorage.getItem(page) as string);
+                    let contact = new core.Contact("", "", "")
+                    contact.deserialize(localStorage.getItem(page) as string)
 
-                    // display the contact in the edit form
-                    $("#fullName").val(contact.FullName);
-                    $("#contactNumber").val(contact.ContactNumber);
-                    $("#emailAddress").val(contact.EmailAddress);
+                    // display contact info in edit form
+                    $("#fullName").val(contact.Name)
+                    $("#contactNumber").val(contact.ContactNumber)
+                    $("#emailAddress").val(contact.EmailAddress)
 
-                    $("#editButton").on("click", (event) =>
-                    {
-                        event.preventDefault();
-                        
-                        // get changes from the page
-                        contact.FullName = $("#fullName").val() as string;
-                        contact.ContactNumber = $("#contactNumber").val() as string;
-                        contact.EmailAddress = $("#emailAddress").val() as string;
+                    // when edit button is pressed, update the contact
+                    $("#editButton").on("click", (event) => {
+                        event.preventDefault()
 
-                        // replace the item in local storage
-                        localStorage.setItem(page, contact.serialize() as string);
-                        // go back to the contact list page (refresh)
-                        LoadLink("contact-list");
-                    });
+                        // get all changes from the form
+                        contact.Name = $("#fullName").val() as string
+                        contact.ContactNumber = $("#contactNumber").val() as string
+                        contact.EmailAddress = $("#emailAddress").val() as string
 
-                    $("#cancelButton").on("click", () =>
-                    {
-                        LoadLink("contact-list");
-                    });
-                    
+                        // replace the changes in localStorage
+                        localStorage.setItem(page, contact.serialize() as string)
+
+                        // go back to contact-list.html
+                        // location.href = '/contact-list'
+                        location.href='/contact-list'
+                    })
+
+                    $("#resetButton").on("click", () => {
+                        // location.href = '/contact-list'
+                        location.href='/contact-list'
+                    })
                 }
-                break;
+                break
         }
+
+        return new Function()
     }
 
-    function CheckLogin() {
-        if (sessionStorage.getItem("user")) {
-            $("#login").html(`<a id="logout" class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>`);
-            $("#logout").on("click", function () {
-                sessionStorage.clear();
-                $("#login").html(`<a class="nav-link" data="login"><i class="fas fa-sign-in-alt"></i> Login</a>`);
-                AddNavigationEvents();
-                LoadLink("login");
-            });
-            
-        } 
+    function DisplayReferences(): Function {
+        console.log("References Page")
+
+        return new Function()
     }
-    function DisplayLoginPage() {
-        console.log("Login Page");
-        let messageArea = $("#messageArea");
-        messageArea.hide();
-        AddLinkEvents("register");
-        $("#loginButton").on("click", function () {
-            let success = false;
-            let newUser: core.User = new core.User();
-            $.getJSON("./Data/users.json", function (data) {
+
+    function DisplayLoginPage(): Function {
+        console.log("Login Page")
+
+        let messageArea = $('#messageArea')
+        messageArea.hide()
+
+        $('#loginButton').on('click', function() {
+            let success = false
+
+            // create an empty user object
+            let newUser = new core.User()
+
+            // use JQuery to load users.json file and read over it
+            $.get('./Data/users.json', function(data) {
+                // iterate over every user in the users.json file... for loop
                 for (const user of data.users) {
-                    let username = $("#username").val();
-                    let password = $("#password").val();
+                    // check if the username and password match the user data
+
+                    let username = document.forms[0].username.value
+                    let password = document.forms[0].password.value
+
+                    // passed in from users.json
                     if (username == user.Username && password == user.Password) {
-                        newUser.fromJSON(user);
-                        success = true;
-                        break;
+                        newUser.fromJSON(user)
+                        success = true
+                        break
                     }
                 }
+
+                // if username and password matched (success = true) -> perform the login sequence
                 if (success) {
-                    let serializedUser = newUser.serialize();
-                    if (serializedUser) {
-                        sessionStorage.setItem("user", serializedUser);
-                        messageArea.removeAttr("class").hide();
-                        LoadLink("contact-list");
-                       
-                    }
+                    // add user to sessionStorage
+                    sessionStorage.setItem('user', newUser.serialize() as string)
+
+                    // hide any error messages
+                    // missing a part of this code
+                    messageArea.removeAttr('class').hide()
+
+                    // redirect the user to the secure area of our website - contact-list.html
+                    // location.href = '/contact-list'
+                    location.href='/contact-list'
+                } else {
+                    // display the error message
+                    $('#username').trigger('focus').trigger('select')
+                    messageArea.addClass('alert alert-danger').text('Error: Invalid Login Credentials.. Username/Password Mismatch').show()
                 }
-                else {
-                    $("#username").trigger("focus").trigger("select");
-                    messageArea.addClass("alert alert-danger").text("Error: Invalid Login Information").show();
-                }
-            });
-        });
-        $("#cancelButton").on("click", function () {
-            document.forms[0].reset();
-            LoadLink("home");
-        });
+            })
+
+            
+        })
+
+        $('#cancelButton').on('click', function() {
+            // clear the form
+            document.forms[0].reset()
+
+            // return to home page
+            // location.href = '/home'
+            location.href='/home'
+        })
+
+        return new Function()
     }
-    function DisplayRegisterPage() {
-        console.log("Register Page");
-        AddLinkEvents("login");
-    }
-    function Display404Page() {
-        console.log("404 Page");
+
+    function CheckLogin(): void {
+        // if the user is logged in, then
+        if (sessionStorage.getItem("user")) {
+            // switch the login button to logout
+            $('#login').html(
+                `<a id="logout" class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>`
+            )
+
+            $('#logout').on('click', function() {
+                // perform logout
+                sessionStorage.clear()
+
+                // switch logout link to login link
+                $('#login').html(
+                    `<a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>`
+                )
+
+                // redirect to login.html
+                location.href = '/login'
+            })
+        }
     }
     
-      
-      
-      
+    function DisplayRegisterPage(): Function {
+        console.log("Registration Page")
 
- 
-    function ActiveLinkCallBack() {
-        switch (router.ActiveLink) {
-            case "home": return DisplayHomePage;
-            case "about": return DisplayAboutPage;
-            case "products": return DisplayProductsPage;
-            case "services": return DisplayServicesPage;
-            case "contact": return DisplayContactPage;
-            case "contact-list": return DisplayContactListPage;
-            case "edit": return DisplayEditPage;
-            case "login": return DisplayLoginPage;
-            case "register": return DisplayRegisterPage;
-            case "404": return Display404Page;
-            default:
-                console.error("ERROR: callback does not exist: " + router.ActiveLink);
-                return new Function();
+        return new Function()
+    }
+
+    function Display404Page(): Function {
+        console.log("404 Page")
+
+        return new Function()
+    }
+    
+    function Start(): void {
+        console.log("App Started Successfully!")
+
+        let pageId = $('body')[0].getAttribute('id')
+
+        CheckLogin()
+
+        switch (pageId) {
+            case "home":
+                DisplayHome()
+            case "projects":
+                DisplayProjects()
+            case "contact":
+                DisplayContacts()
+            case "contact-list":
+                AuthGuard()
+                DisplayContactList()
+            case "references":
+                DisplayReferences()
+            case "edit":
+                AuthGuard()
+                DisplayEditPage()
+            case "login":
+                DisplayLoginPage()
+            case "register":
+                DisplayRegisterPage()
+            case "404":
+                Display404Page()
         }
+
     }
-    $(document).ready(function() {
-        Start();
-    });
-    function Start() {
-        console.log("App Started!");
-        LoadHeader();
-        LoadLink("home");
-        LoadFooter();
-    }
-    window.addEventListener("load", Start);
-    $(document).ready(function () {
-        Start();
-        ActiveLinkCallBack();
-        
-    });
-})();
-//# sourceMappingURL=app.js.map
+
+    window.addEventListener("load", Start)
+})()

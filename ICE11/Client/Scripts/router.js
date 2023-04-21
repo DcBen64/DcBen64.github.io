@@ -22,7 +22,7 @@ var core;
         Add(route) {
             this.m_routingTable.push(route);
         }
-        AddTable(routingTable) {
+        AddRoutingTable(routingTable) {
             this.m_routingTable = routingTable;
         }
         Find(route) {
@@ -42,14 +42,14 @@ var core;
     core.Router = Router;
 })(core || (core = {}));
 let router = new core.Router();
-router.AddTable([
+router.AddRoutingTable([
     "/",
     "/home",
     "/about",
     "/services",
     "/contact",
     "/contact-list",
-    "/products",
+    "/projects",
     "/register",
     "/login",
     "/edit"

@@ -2,6 +2,12 @@
 var core;
 (function (core) {
     class User {
+        constructor(displayName = "", emailAddress = "", username = "", password = "") {
+            this.m_displayName = displayName;
+            this.m_emailAddress = emailAddress;
+            this.m_username = username;
+            this.m_password = password;
+        }
         get DisplayName() {
             return this.m_displayName;
         }
@@ -11,8 +17,8 @@ var core;
         get EmailAddress() {
             return this.m_emailAddress;
         }
-        set EmailAddress(email_address) {
-            this.m_emailAddress = email_address;
+        set EmailAddress(emailAddress) {
+            this.m_emailAddress = emailAddress;
         }
         get Username() {
             return this.m_username;
@@ -26,14 +32,8 @@ var core;
         set Password(password) {
             this.m_password = password;
         }
-        constructor(displayName = "", emailAddress = "", username = "", password = "") {
-            this.m_displayName = displayName;
-            this.m_emailAddress = emailAddress;
-            this.m_username = username;
-            this.m_password = password;
-        }
         toString() {
-            return `Display Name    : ${this.DisplayName} \nEmail Address : ${this.EmailAddress} \nUsername : ${this.Username}`;
+            return `Display Name: ${this.DisplayName}\nEmail Address: ${this.EmailAddress}\nUsername: ${this.Username}`;
         }
         toJSON() {
             return {
@@ -49,13 +49,10 @@ var core;
             this.Password = data.Password;
         }
         serialize() {
-            if (this.DisplayName !== "" && this.EmailAddress !== "" && this.Username !== "") {
-                return `${this.DisplayName},${this.EmailAddress},${this.Username}`;
-            }
-            else {
-                console.error("One or more properties of the User is empty");
-                return null;
-            }
+            if (this.DisplayName !== "" && this.EmailAddress !== "" && this.Username !== "")
+                return `${this.DisplayName}, ${this.EmailAddress}, ${this.Username}`;
+            console.error("One or more properties or fields of the Contact Object are missing or invalid!");
+            return null;
         }
         deserialize(data) {
             let propertyArray = data.split(",");
