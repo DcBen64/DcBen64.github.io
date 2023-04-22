@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+require('dotenv').config();
+
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -10,6 +13,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const index_1 = __importDefault(require("./Routes/index"));
 const users_1 = __importDefault(require("./Routes/users"));
+const contactsRouter = require('./Routes/contacts');
 const app = (0, express_1.default)();
 app.set('views', path_1.default.join(__dirname, 'Views'));
 app.set('view engine', 'ejs');
@@ -30,5 +34,13 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.render('error');
 });
+// Replace the following URL with your MongoDB connection string.
+// If you're using a local MongoDB instance, the URL will be 'mongodb://localhost/your_database_name'
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/BMWeb';
+
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB:', err));
+
 exports.default = app;
 //# sourceMappingURL=app.js.map

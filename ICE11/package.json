@@ -36,6 +36,7 @@
     "is-odd": "^3.0.1",
     "jquery": "^3.6.3",
     "mime-types": "^2.1.35",
+    "mongoose": "^7.0.4",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
