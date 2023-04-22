@@ -25,6 +25,9 @@ app.use(express_1.default.static(path_1.default.join(__dirname, 'Client')));
 app.use(express_1.default.static(path_1.default.join(__dirname, 'node_modules')));
 app.use('/', index_1.default);
 app.use('/users', users_1.default);
+// Include and use routes
+const routes = require('./Routes/conConnect');
+app.use('/', routes);
 app.use((req, res, next) => {
     next((0, http_errors_1.default)(404));
 });
@@ -37,6 +40,7 @@ app.use((err, req, res, next) => {
 // Replace the following URL with your MongoDB connection string.
 // If you're using a local MongoDB instance, the URL will be 'mongodb://localhost/your_database_name'
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/BMWeb';
+// Include and use routes
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))

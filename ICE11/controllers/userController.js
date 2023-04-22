@@ -65,7 +65,22 @@ exports.postRegister = (req, res) => {
     });
   });
 };
-
+exports.postLogin = (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.render('login', { errorMessage: 'Invalid username or password' });
+    }
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.redirect('/');
+    });
+  })(req, res, next);
+};
 
 exports.logout = (req, res) => {
   req.logout(() => {
