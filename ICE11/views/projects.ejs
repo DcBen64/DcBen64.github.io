@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('partials/_header', { title: 'Projects - WEBD6201 Demo' }) %>
+    <link rel='stylesheet' href='/stylesheets/app.css' />
+  </head>
+  <body>
+<div class="container">
+    <header class="mt-5">
+      <h1 id="welcome">
+        WEBD 6201 Lab 1 Projects Page
+        <i class="fa-solid fa-bars-progress"></i>
+        <h2 id="displayEvent" class="border"></h2>
+      </h1>
+    </header>
+  </div>
+  <main>
+    <div class="project" id="project1">
+      <h2>Project 1: Hospital Dashboard</h2>
+      <p>
+        This hospital U.I. was designed as a way to modernize the Lakeridge Community Hospital Database. It features multiple dashboards to handle CRUD operations for patients as well as provide important revenue statistics.
+      </p>
+      <img class="small-image" src="/images/DbasFinal1.PNG" alt="Project 1" />
+    </div>
+    <div class="project" id="project2">
+      <h2>Project 2: Code Camp RPG JS</h2>
+      <p>
+        This is a code camp project U.I. made entirely out of JavaScript and HTML forms for the purpose of learning some of the intricacies of handling scripts.
+      </p>
+      <img
+        class="small-image"
+        src="/images/Capture.PNG"
+        alt="Project 2"
+      />
+    </div>
+    <div class="project" id="project3">
+      <h2>Project 3: Flappy Bird</h2>
+      <p>
+        This game features Flappy Bird-like thematics made entirely out of scratch!
+      </p>
+      <img
+        class="small-image"
+        src="/images/firstCodeProject.JPG"
+        alt="Project 3"
+      />
+    </div>
+  </main>
+  
+  <div class="container">
+    <div class="mb-3">
+      <label for="disabledTextInput" class="form-label" id="userDisplay"></label>
+    </div>
+    <div class="mb-3">
+      <label for="disabledTextInput" class="form-label" id="passDisplay"></label>
+    </div>
+  </div>
+  <%- include('partials/_footer.ejs') %>
