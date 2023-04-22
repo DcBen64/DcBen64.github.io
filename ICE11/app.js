@@ -56,7 +56,7 @@ const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 
 // Include and use routes
-const routes = require('./routes/routes');
+const routes = require('./Routes/routes');
 app.use('/', routes);
 
 
