@@ -19,7 +19,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 // Set up view engine
-app.set('views', path.join(__dirname, 'views'));
+app.set('Views', path.join(__dirname, 'Views'));
 app.set('view engine', 'ejs');
 
 // Serve static files
