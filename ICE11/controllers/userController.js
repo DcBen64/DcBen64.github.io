@@ -12,7 +12,7 @@ exports.getRegister = (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    res.render('update', { user, dataType: 'user', currentUser: req.user || null });
+    res.render('update', { user, dataType: 'user', user: req.user || null });
   } catch (error) {
     res.status(500).send('Error retrieving user: ' + error.message);
   }
@@ -65,22 +65,7 @@ exports.postRegister = (req, res) => {
     });
   });
 };
-exports.postLogin = (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.render('login', { errorMessage: 'Invalid username or password' });
-    }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      return res.redirect('/');
-    });
-  })(req, res, next);
-};
+
 
 exports.logout = (req, res) => {
   req.logout(() => {

@@ -7,7 +7,7 @@
     "predeploy": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lite-server": "lite-server",
-    "start": "node server.js",
+    "start": "node ./bin/www",
     "nodemon": "nodemon -e js server.js",
     "build": "tsc"
   },

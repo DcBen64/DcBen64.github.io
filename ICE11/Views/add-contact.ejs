@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('partials/_header', { title: 'Add Contact - WEBD6201 Demo' }) %>
+    <link rel='stylesheet' href='/stylesheets/app.css' />
+  </head>
+  <body>
+    <main>
+      <div class="container mt-5">
+        <h2>Add Contact</h2>
+        <form action="/contact" method="post">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <!-- Change the name attribute of the email input to emailAddress -->
+<div class="mb-3">
+  <label for="email" class="form-label">Email address</label>
+  <input type="email" class="form-control" id="email" name="emailAddress" required>
+</div>
+
+<!-- Change the name attribute of the phone input to contactNumber -->
+<div class="mb-3">
+  <label for="phone" class="form-label">Phone number</label>
+  <input type="text" class="form-control" id="phone" name="contactNumber">
+</div>
+          <button type="submit" class="btn btn-primary">Add Contact</button>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>
+<%- include('partials/_footer') %>
